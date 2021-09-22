@@ -8,9 +8,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 const app = express()
-
 const passport = require('./config/passport')
-
 const port = process.env.PORT || 3000
 
 app.use(cors());
