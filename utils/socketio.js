@@ -12,6 +12,7 @@ const socket = server => {
     cors: {
       origin: [
         'http://localhost:3000',
+        'http://localhost:8080',
       ],
       methods: ['GET', 'POST'],
       transports: ['websocket', 'polling'],
@@ -38,19 +39,25 @@ const socket = server => {
       socket.broadcast.emit("announce", d)
     })
 
+
+    socket.on('connect', (d) => {
+      console.log('d')
+
+    })
+
     socket.on('chatmessage', (msg) => {
       console.log('msg', msg)
       io.emit('new message', msg)
       //TODO 建立message database
     })
 
-    // socket.on('leavePublic',  () => {
-    //   clientsCount-=1
-    //   console.log("A user leaved.")
-    //   io.emit("announce", {
-    //     message: 'user 離線'
-    //   })
-    // })
+    socket.on('leavePublic',  () => {
+      clientsCount-=1
+      console.log("A user leaved.")
+      io.emit("announce", {
+        message: 'user 離線'
+      })
+    })
     socket.on('disconnect', () => {
 
       console.log(`有人離開：目前人數:', clientsCount`)

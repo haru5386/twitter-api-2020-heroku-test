@@ -1,5 +1,5 @@
 const passport = require('../config/passport')
-
+const jwt = require('jsonwebtoken')
 
 const authenticated = (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
@@ -42,9 +42,10 @@ const authenticatedSocket = (socket, next) => {
   console.log('socket.handshake', socket.handshake)
   console.log('socket.handshake.auth', socket.handshake.auth)
   if (socket.handshake.auth && socket.handshake.auth.token) {
+    console.log('ok')
     jwt.verify(
       socket.handshake.auth.token,
-      process.env.JWTSECRET,
+      process.env.JWT_SECRET,
       (err, decoded) => {
         if (err) {
           console.log(err.message)
