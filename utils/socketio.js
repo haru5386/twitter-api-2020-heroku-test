@@ -24,11 +24,13 @@ const socket = server => {
 
   if (!io) throw new Error('No socket io server instance')
 
+
   io/*.use(authenticatedSocket)*/.on('connection', socket => {
     console.log(socket.user)
     //先隨便設定username
+
     console.log('===== connected!!! =====')
-    //計算目前使用io的人
+
     const { clientsCount } = io.engine
 
     console.log('有人加入公開聊天室，目前人數:', clientsCount)
@@ -36,6 +38,7 @@ const socket = server => {
     socket.on('joinPublic', (msg) => {
       console.log(msg)
       io.emit("announce", msg)
+
     })
 
     socket.on('chatmessage', (msg) => {
@@ -46,10 +49,12 @@ const socket = server => {
 
     socket.on('leavePublic', () => {
       clientsCount -= 1
+
       console.log("A user leaved.")
       io.emit("announce", {
         message: 'user 離線'
       })
+
     })
     socket.on('disconnect', (msg) => {
       io.emit("announce", ` 離開`)
