@@ -24,47 +24,41 @@ const socket = server => {
 
   if (!io) throw new Error('No socket io server instance')
 
-  io.use(authenticatedSocket).on('connection', socket => {
+  io/*.use(authenticatedSocket)*/.on('connection', socket => {
     console.log(socket.user)
     //先隨便設定username
     console.log('===== connected!!! =====')
     //計算目前使用io的人
     const { clientsCount } = io.engine
+
     console.log('有人加入公開聊天室，目前人數:', clientsCount)
-    // socket.broadcast.emit("announce", {
-    //     message: `User${socket.username} 上線`
-    //   })
 
-    socket.on('joinPublic', (d) => {
-      console.log(`${d.name} 上線`)
-      socket.broadcast.emit("announce", d)
-    })
-
-
-    socket.on('connect', (d) => {
-      console.log('d')
-
+    socket.on('joinPublic', (msg) => {
+      console.log(msg)
+      io.emit("announce", msg)
     })
 
     socket.on('chatmessage', (msg) => {
       console.log('msg', msg)
-      io.emit('new message', msg)
+      io.emit('newMessage', msg)
       //TODO 建立message database
     })
 
-    socket.on('leavePublic',  () => {
-      clientsCount-=1
+    socket.on('leavePublic', () => {
+      clientsCount -= 1
       console.log("A user leaved.")
       io.emit("announce", {
         message: 'user 離線'
       })
     })
-    socket.on('disconnect', () => {
-
-      console.log(`有人離開：目前人數:', clientsCount`)
-
+    socket.on('disconnect', (msg) => {
+      io.emit("announce", ` 離開`)
+      console.log(msg)
+      console.log(`有人離開：目前人數:', ${clientsCount}`)
     })
-
+    socket.on('bye',(msg)=>{
+      console.log(msg)
+    })
   })
 }
 

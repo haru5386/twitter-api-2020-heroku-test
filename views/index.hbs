@@ -14,14 +14,6 @@
   <div id="right">
     <div id="status-box">Server: <span id="status">-</span> / <span id="online">0</span> online.</div>
     <div id="content">
-      <div class="msg">
-        <span class="name">Duye</span>
-        Hello!
-      </div>
-      <div class="msg">
-        <span class="name">Alice</span>
-        Hi!
-      </div>
     </div>
 
     <div id="send-box">
@@ -53,20 +45,26 @@
     const sendForm = document.getElementById("send-form")
     const nowuser = document.getElementById("nowuser")
     const msg = document.getElementById("msg")
+    const left = document.getElementById("left")
 
     socket.on("connect", function () {
       status.innerText = "Connected.";
-      socket.emit("joinPublic", { name: nowuser.value })
+      socket.emit("joinPublic",{user:id})
     })
 
-    socket.on("announce", function (d) {
-      console.log(d)
+    socket.on("disconnect", function () {
+      status.innerText = "disconnect.";
+      console.log('disconnect')
+    })
+
+    socket.on("announce", function (info) {
+      console.log(info.message)
       const joinAndout = document.createElement("div")
       joinAndout.className = "joinAndout"
-
-      const usermsg = document.createTextNode(d.name + ' joined the room')
+      const usermsg = document.createTextNode(info.message)
       joinAndout.appendChild(usermsg)
       content.appendChild(joinAndout)
+
     })
 
     sendForm.addEventListener("submit", function (e) {
@@ -116,6 +114,7 @@
     width: 30%;
     margin-right: 10px;
     border: 1px solid rgb(0, 0, 0);
+    overflow: hidden;
   }
 
   #send-box {

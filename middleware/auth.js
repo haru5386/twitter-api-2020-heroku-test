@@ -34,10 +34,11 @@ const checkRoleIsUser = (req, res, next) => {
   }
   next()
 }
-const authenticatedSocket = (socket, next) => {
-  if (socket.handshake.auth == null || socket.handshake.auth.token == null) {
+const authenticatedSocket = async (socket, next) => {
+try{  if (socket.handshake.auth == null || socket.handshake.auth.token == null) {
     console.log('no handshake.auth')
-    return next(new RequestError('user\'s token required.'))
+  // console.log(socket.handshake)
+  return next(new Error('123456'))
   }
 
   if (socket.handshake.auth && socket.handshake.auth.token) {
@@ -47,7 +48,7 @@ const authenticatedSocket = (socket, next) => {
       token,SECRET, async (err, decoded) => {
         if (err) {
           console.log(err.message)
-          return next(new RequestError('jwt auth error.'))
+          return next(new Error('jwt auth error.'))
         }
         socket.user = (await User.findByPk(decoded.id, {
           attributes:[
@@ -57,7 +58,7 @@ const authenticatedSocket = (socket, next) => {
         next()
       }
     )
-  }
+  }}catch(err){console.log(err)}
 }
 
 module.exports = {
