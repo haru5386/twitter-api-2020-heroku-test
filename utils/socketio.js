@@ -40,6 +40,10 @@ const socket = server => {
     console.log('有人加入公開聊天室，目前人數:', clientsCount)
 
     socket.on('joinPublic', async (userId) => {
+      await socket.join('PublicRoom')
+      const rooms = io.of("/").adapter.rooms;
+      console.log('PublicRoom', rooms)
+      console.log('UserSocketID',socket.id)
       console.log('userId', userId)
       let user = await User.findByPk(userId, { attributes: ['id', 'name', 'account', 'avatar'] })
       user = user.toJSON()
@@ -61,6 +65,9 @@ const socket = server => {
     })
 
     socket.on('leavePublic', async(userId) => {
+      await socket.leave('PublicRoom')
+      const rooms = io.of("/").adapter.rooms;
+      console.log('LeavePublicRoom', rooms)
       console.log(userId)
       console.log('onlineList', onlineList)
       let userIndex = onlineList.findIndex(x => x.id === Number(userId))
