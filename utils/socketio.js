@@ -47,6 +47,8 @@ const socket = server => {
       addUser(user)
       console.log('--------')
       console.log(onlineList)
+      console.log('---clientsCount in ---')
+      console.log(clientsCount)
       io.emit("announce", user)
     })
 
@@ -58,11 +60,8 @@ const socket = server => {
       postChat(user, data.msg)
     })
 
-
-
-
     socket.on('leavePublic', async(userId) => {
-      await socket.leave('connection')
+      console.log(userId)
       console.log('onlineList', onlineList)
       let userIndex = onlineList.findIndex(x => x.id === Number(userId))
 
@@ -73,6 +72,8 @@ const socket = server => {
 
       console.log('-------刪除後onlineList------')
       console.log(onlineList)
+      console.log('---clientsCount out ---')
+      console.log(clientsCount)
       io.emit("onlineList",　onlineList)
 
     })
