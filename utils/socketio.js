@@ -39,13 +39,13 @@ const socket = server => {
     console.log('有人加入公開聊天室，目前人數:', clientsCount)
 
     socket.on('joinPublic', async (userId) => {
-      console.log(userId)
+      console.log('userId', userId)
       let user = await User.findByPk(userId, { attributes: ['id', 'name', 'account', 'avatar'] })
       user = user.toJSON()
-      console.log(user)
+      console.log('user',user)
       addUser(user)
       console.log('--------')
-      console.log(onlineList)
+      //console.log(onlineList)
       io.emit("announce", userId)
     })
 
@@ -56,35 +56,27 @@ const socket = server => {
     })
 
 
-    socket.on('leavePublic', () => {
-      //1.確定離開使用者id(前端傳) -> 假定userId 111(num)
-      const userId = 1
-      //2.抓userList離開人的name 建立通道announce，XXX離開
-      const userIndex = onlineList.findIndex(x => x.id === userId)
-      const userName = onlineList[userIndex].name
-      console.log(userName,'離開')
-      io.emit("announce",　` ${userName} 離開`)
-      socket.leave(socket['joinPublic'])
+    socket.on('leavePublic', async(userId) => {
+      await socket.leave('connection')
+      console.log('onlineList', onlineList)
+      let userIndex = onlineList.findIndex(x => x.id === Number(userId))
 
-      //3.在userList刪去該用戶obj
-      onlineList.splice(userIndex,1)
+      if(userIndex !== -1){
+        
+        getRemoveUser(userIndex)
+      }
+
+      console.log('-------刪除後onlineList------')
       console.log(onlineList)
       io.emit("onlineList",　onlineList)
 
     })
-
-/*     socket.on('disconnect', (msg) => {
-      io.emit("announce", ` ${clientsCount} 離開`)
-      console.log(msg)
-      console.log(`有人離開：目前人數:', ${clientsCount}`)
-    }) */
-
   })
 }
 
 function addUser(user) {
   let exist = onlineList.some(u => u.id === user.id)
-  console.log(exist)
+  //console.log(exist)
   if (exist) {
     io.emit('onlineList', onlineList)
   } else {
@@ -93,8 +85,15 @@ function addUser(user) {
   }
 }
 
-function removeUser(user){
-  onlineList.splice(onlineList.indexOf(user),1)
-}
+// GET removeUserName, 更新onlineList
+function getRemoveUser(userIndex){
+  const userName = onlineList[userIndex].name
+  console.log(userName,'離開')
+  io.emit("announce",　` ${userName} 離開`)
+  onlineList.splice(userIndex,1)
+  console.log(onlineList)
+  }
+
+
 
 module.exports = { socket }
