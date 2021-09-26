@@ -1,7 +1,8 @@
-//server
-const socketio = require('socket.io')
+// announce 統一設定為廣播在Msg
+// 需要個別統計公開人數?
 
-const { authenticatedSocket } = require('../middleware/auth') //TODO
+const socketio = require('socket.io')
+const { authenticatedSocket } = require('../middleware/auth')
 
 let io
 let userList = []
@@ -24,10 +25,7 @@ const socket = server => {
 
   if (!io) throw new Error('No socket io server instance')
 
-
   io/*.use(authenticatedSocket)*/.on('connection', socket => {
-    console.log(socket.user)
-    //先隨便設定username
 
     console.log('===== connected!!! =====')
 
@@ -47,23 +45,28 @@ const socket = server => {
       //TODO 建立message database
     })
 
-    socket.on('leavePublic', () => {
-      clientsCount -= 1
 
-      console.log("A user leaved.")
-      io.emit("announce", {
-        message: 'user 離線'
-      })
+    socket.on('leavePublic', () => {
+      //1.確定離開使用者id(前端傳) -> 假定userId 111(num) ok
+      const userId = 1
+      //2.抓userList離開人的name 建立通道announce，XXX離開 ok
+      const userIndex = onlineList.findIndex(x => x.id === userId)
+      const userName = onlineList[userIndex].name
+      console.log(userName,'離開')
+      io.emit("announce",　` ${userName} 離開`)
+      //3.在userList刪去該用戶obj
+      onlineList.splice(userIndex,1)
+      console.log(onlineList)
+      io.emit("onlineList",　onlineList)
 
     })
-    socket.on('disconnect', (msg) => {
-      io.emit("announce", ` 離開`)
+
+/*     socket.on('disconnect', (msg) => {
+      io.emit("announce", ` ${clientsCount} 離開`)
       console.log(msg)
       console.log(`有人離開：目前人數:', ${clientsCount}`)
-    })
-    socket.on('bye',(msg)=>{
-      console.log(msg)
-    })
+    }) */
+
   })
 }
 
