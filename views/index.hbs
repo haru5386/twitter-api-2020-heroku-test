@@ -58,13 +58,17 @@
       console.log('disconnect')
       socket.emit("leavePublic", nowuser.value)
     })
-   
+
     socket.on("onlineList", function (data) {
       console.log(data)
     })
-
+    socket.on("newMessage", function (data) {
+      console.log('---newMessage---')
+      console.log(data)
+    })
     socket.on("announce", function (info) {
-      console.log(info.message)
+      console.log('---announce---')
+      console.log(info)
       const joinAndout = document.createElement("div")
       joinAndout.className = "joinAndout"
       const usermsg = document.createTextNode(info.message)
@@ -75,21 +79,9 @@
 
     sendForm.addEventListener("submit", function (e) {
       e.preventDefault();
-      const formData = { name: nowuser.value, msg: msg.value };
+      const formData = { UserId: nowuser.value, msg: msg.value };
       socket.emit("chatmessage", formData);
     })
-    socket.on("new message", function (d) {
-      const msgBox = document.createElement("div")
-      const nameBox = document.createElement("span")
-
-      const name = document.createTextNode(d.name);
-      const msg = document.createTextNode(d.msg);
-      8
-      nameBox.appendChild(name);
-      msgBox.appendChild(nameBox);
-      msgBox.appendChild(msg);
-      content.appendChild(msgBox);
-    });
 
   })
 </script>

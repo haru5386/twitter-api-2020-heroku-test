@@ -4,6 +4,7 @@
 const { authenticatedSocket } = require('../middleware/auth')
 const { User, Sequelize } = require('../models')
 const socketio = require('socket.io')
+const { postChat} = require('../controllers/chatroomController')
 
 
 let io
@@ -46,17 +47,20 @@ const socket = server => {
       addUser(user)
       console.log('--------')
       console.log(onlineList)
-      io.emit("announce", userId)
+      io.emit("announce", user)
     })
 
-    socket.on('chatmessage', (msg) => {
-      console.log('msg', msg)
-      io.emit('newMessage', msg)
+    socket.on('chatmessage', async (data) => {
+      const userId = data.UserId
+      let user = await User.findByPk(userId, { attributes: ['id', 'name', 'account', 'avatar'] })
+      user = user.toJSON()
+      io.emit('newMessage', { user: user, msg: data.msg, date: new Date() })
+      postChat(user, data.msg)
       //TODO 建立message database
     })
 
 
-    socket.on('leavePublic', () => {
+ /*   socket.on('leavePublic', () => {
       //1.確定離開使用者id(前端傳) -> 假定userId 111(num) ok
       const userId = 1
       //2.抓userList離開人的name 建立通道announce，XXX離開 ok
