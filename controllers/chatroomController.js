@@ -24,6 +24,7 @@ let chatroomController = {
             model: User, attributes: ['id', 'name', 'avatar', 'account'],
             where: { role: { [Op.not]: 'admin' } }
           }],
+        order: [['createdAt', 'ASC']],
         raw: true,
         nest: true
       })

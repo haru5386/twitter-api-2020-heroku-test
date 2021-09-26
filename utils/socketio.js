@@ -28,7 +28,7 @@ const socket = server => {
 
   if (!io) throw new Error('No socket io server instance')
 
-  io.use(authenticatedSocket).on('connection', socket => {
+  io/*.use(authenticatedSocket)*/.on('connection', socket => {
 
     console.log(socket.user)
 
@@ -53,7 +53,7 @@ const socket = server => {
       console.log(onlineList)
       console.log('---clientsCount in ---')
       console.log(clientsCount)
-      io.emit("announce", user)
+      socket.emit("announce", user)
     })
 
     socket.on('chatmessage', async (data) => {
