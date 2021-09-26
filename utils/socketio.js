@@ -4,7 +4,7 @@
 const { authenticatedSocket } = require('../middleware/auth')
 const { User, Sequelize } = require('../models')
 const socketio = require('socket.io')
-const { postChat} = require('../controllers/chatroomController')
+const { postChat } = require('../controllers/chatroomController')
 
 
 let io
@@ -15,8 +15,10 @@ const socket = server => {
   io = socketio(server, {
     cors: {
       origin: [
+        'https://danielgg1024.github.io/twitter-front-end-vue/',
         'http://localhost:3000',
         'http://localhost:8080',
+        'https://tranquil-crag-64775.herokuapp.com/'
       ],
       methods: ['GET', 'POST'],
       transports: ['websocket', 'polling'],
@@ -40,14 +42,13 @@ const socket = server => {
     console.log('有人加入公開聊天室，目前人數:', clientsCount)
 
     socket.on('joinPublic', async (userId) => {
-      await socket.join('PublicRoom')
       const rooms = io.of("/").adapter.rooms;
       console.log('PublicRoom', rooms)
-      console.log('UserSocketID',socket.id)
+      console.log('UserSocketID', socket.id)
       console.log('userId', userId)
       let user = await User.findByPk(userId, { attributes: ['id', 'name', 'account', 'avatar'] })
       user = user.toJSON()
-      console.log('user',user)
+      console.log('user', user)
       addUser(user)
       console.log('----onlineList----')
       console.log(onlineList)
@@ -64,23 +65,22 @@ const socket = server => {
       postChat(user, data.msg)
     })
 
-    socket.on('leavePublic', async(userId) => {
-      await socket.leave('PublicRoom')
+    socket.on('leavePublic', async (userId) => {
       const rooms = io.of("/").adapter.rooms;
-      console.log('LeavePublicRoom', rooms)
       console.log(userId)
       console.log('onlineList', onlineList)
       let userIndex = onlineList.findIndex(x => x.id === Number(userId))
-      if(userIndex !== -1){
+      if (userIndex !== -1) {
         getRemoveUser(userIndex)
       }
       console.log('-------刪除後onlineList------')
       console.log(onlineList)
       console.log('---clientsCount out ---')
       console.log(clientsCount)
-      io.emit("onlineList",　onlineList)
+      io.emit("onlineList", onlineList)
 
     })
+
   })
 }
 
@@ -96,12 +96,13 @@ function addUser(user) {
 }
 
 // GET removeUserName, 更新onlineList
-function getRemoveUser(userIndex){
+function getRemoveUser(userIndex) {
   const userName = onlineList[userIndex].name
-  console.log(userName,'離開')
-  io.emit("announce",　` ${userName} 離開`)
-  onlineList.splice(userIndex,1)
-  }
+  console.log(userName, '離開')
+  io.emit("announce", ` ${userName} 離開`)
+  io.emit('onlineList', onlineList)
+  onlineList.splice(userIndex, 1)
+}
 
 
 
