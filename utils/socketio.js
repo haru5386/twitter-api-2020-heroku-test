@@ -2,9 +2,10 @@
 const socketio = require('socket.io')
 
 const { authenticatedSocket } = require('../middleware/auth') //TODO
+const { User, Sequelize } = require('../models')
 
 let io
-let userList = []
+let onlineList = []
 
 const socket = server => {
   // Set up socket.io
@@ -27,7 +28,6 @@ const socket = server => {
 
   io/*.use(authenticatedSocket)*/.on('connection', socket => {
     console.log(socket.user)
-    //先隨便設定username
 
     console.log('===== connected!!! =====')
 
@@ -35,10 +35,15 @@ const socket = server => {
 
     console.log('有人加入公開聊天室，目前人數:', clientsCount)
 
-    socket.on('joinPublic', (msg) => {
-      console.log(msg)
-      io.emit("announce", msg)
-
+    socket.on('joinPublic', async (userId) => {
+      console.log(userId)
+      let user = await User.findByPk(userId, { attributes: ['id', 'name', 'account', 'avatar'] })
+      user = user.toJSON()
+      console.log(user)
+      addUser(user)
+      console.log('--------')
+      console.log(onlineList)
+      io.emit("announce", userId)
     })
 
     socket.on('chatmessage', (msg) => {
@@ -47,24 +52,27 @@ const socket = server => {
       //TODO 建立message database
     })
 
-    socket.on('leavePublic', () => {
-      clientsCount -= 1
-
-      console.log("A user leaved.")
-      io.emit("announce", {
-        message: 'user 離線'
-      })
-
-    })
     socket.on('disconnect', (msg) => {
       io.emit("announce", ` 離開`)
       console.log(msg)
       console.log(`有人離開：目前人數:', ${clientsCount}`)
     })
-    socket.on('bye',(msg)=>{
-      console.log(msg)
-    })
   })
+}
+
+function addUser(user) {
+  let exist = onlineList.some(u => u.id === user.id)
+  console.log(exist)
+  if (exist) {
+    io.emit('onlineList', onlineList)
+  } else {
+    onlineList.push(user)
+    io.emit('onlineList', onlineList)
+  }
+}
+
+function removeUser(user){
+  onlineList.splice(onlineList.indexOf(user),1)
 }
 
 module.exports = { socket }
