@@ -47,13 +47,15 @@ const socket = server => {
 
 
     socket.on('leavePublic', () => {
-      //1.確定離開使用者id(前端傳) -> 假定userId 111(num) ok
+      //1.確定離開使用者id(前端傳) -> 假定userId 111(num)
       const userId = 1
-      //2.抓userList離開人的name 建立通道announce，XXX離開 ok
+      //2.抓userList離開人的name 建立通道announce，XXX離開
       const userIndex = onlineList.findIndex(x => x.id === userId)
       const userName = onlineList[userIndex].name
       console.log(userName,'離開')
       io.emit("announce",　` ${userName} 離開`)
+      socket.leave(socket['joinPublic'])
+
       //3.在userList刪去該用戶obj
       onlineList.splice(userIndex,1)
       console.log(onlineList)
