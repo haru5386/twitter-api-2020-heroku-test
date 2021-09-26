@@ -1,5 +1,5 @@
 <h1>chat room</h1>
-<input type="text" id="nowuser" value="{{user.name}}">
+<input type="text" id="nowuser" value="{{user.id}}">
 <input type="text" id="nowtoken" value="{{token}}">
 <div id="container">
   <div id="left">
@@ -46,15 +46,21 @@
     const nowuser = document.getElementById("nowuser")
     const msg = document.getElementById("msg")
     const left = document.getElementById("left")
+    console.log(nowuser.value)
 
     socket.on("connect", function () {
       status.innerText = "Connected.";
-      socket.emit("joinPublic",{user:id})
+      socket.emit("joinPublic", nowuser.value)
     })
 
     socket.on("disconnect", function () {
       status.innerText = "disconnect.";
       console.log('disconnect')
+      socket.emit("leavePublic", nowuser.value)
+    })
+   
+    socket.on("onlineList", function (data) {
+      console.log(data)
     })
 
     socket.on("announce", function (info) {
