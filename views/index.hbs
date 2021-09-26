@@ -23,6 +23,8 @@
       </form>
     </div>
   </div>
+  <a href="/login" id="quit"><button>quit</button></a>
+
 </div>
 
 
@@ -46,6 +48,7 @@
     const nowuser = document.getElementById("nowuser")
     const msg = document.getElementById("msg")
     const left = document.getElementById("left")
+    const quit = document.getElementById("quit")
     console.log(nowuser.value)
 
     socket.on("connect", function () {
@@ -58,7 +61,7 @@
       console.log('disconnect')
       socket.emit("leavePublic", nowuser.value)
     }) */
-    
+
     //必須設定觸發
     socket.emit("leavePublic", nowuser.value)
 
@@ -79,7 +82,10 @@
       content.appendChild(joinAndout)
 
     })
-
+    quit.addEventListener('click', (e) => {
+      socket.emit("leavePublic", nowuser.value)
+    })
+    
     sendForm.addEventListener("submit", function (e) {
       e.preventDefault();
       const formData = { UserId: nowuser.value, msg: msg.value };
