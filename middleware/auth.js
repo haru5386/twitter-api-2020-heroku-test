@@ -41,8 +41,9 @@ try{  if (socket.handshake.auth == null || socket.handshake.auth.token == null) 
   // console.log(socket.handshake)
   return next(new Error('123456'))
   }
-
   if (socket.handshake.auth && socket.handshake.auth.token) {
+    console.log('-------socket------')
+    console.log(socket.handshake)
     const token = socket.handshake.auth.token
     const SECRET = process.env.JWT_SECRET
     jwt.verify(

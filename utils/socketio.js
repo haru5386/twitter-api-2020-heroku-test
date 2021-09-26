@@ -28,7 +28,7 @@ const socket = server => {
 
   if (!io) throw new Error('No socket io server instance')
 
-  io/*.use(authenticatedSocket)*/.on('connection', socket => {
+  io.use(authenticatedSocket).on('connection', socket => {
 
     console.log(socket.user)
 
@@ -49,7 +49,7 @@ const socket = server => {
       user = user.toJSON()
       console.log('user',user)
       addUser(user)
-      console.log('--------')
+      console.log('----onlineList----')
       console.log(onlineList)
       console.log('---clientsCount in ---')
       console.log(clientsCount)
@@ -71,12 +71,9 @@ const socket = server => {
       console.log(userId)
       console.log('onlineList', onlineList)
       let userIndex = onlineList.findIndex(x => x.id === Number(userId))
-
       if(userIndex !== -1){
-        
         getRemoveUser(userIndex)
       }
-
       console.log('-------刪除後onlineList------')
       console.log(onlineList)
       console.log('---clientsCount out ---')
@@ -104,7 +101,6 @@ function getRemoveUser(userIndex){
   console.log(userName,'離開')
   io.emit("announce",　` ${userName} 離開`)
   onlineList.splice(userIndex,1)
-  console.log(onlineList)
   }
 
 
