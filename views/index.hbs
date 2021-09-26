@@ -56,8 +56,9 @@
     socket.on("disconnect", function () {
       status.innerText = "disconnect.";
       console.log('disconnect')
+      socket.emit("leavePublic", nowuser.value)
     })
-
+   
     socket.on("onlineList", function (data) {
       console.log(data)
     })
