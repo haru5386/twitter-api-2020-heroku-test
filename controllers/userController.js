@@ -243,7 +243,7 @@ let userController = {
       //找user's followers
       const user = await User.findByPk(req.user.id, {
         include: [
-          { model: User, as: 'Followers', attributes: ['id']},
+          { model: User, as: 'Followers', attributes: ['id'] },
         ]
       })
       let followers = user.Followers.map(user => { return user.id }) //array去裝followers
@@ -284,7 +284,8 @@ let userController = {
       const { id } = req.params
       let user = await User.findByPk(id, {
         include: [
-          { model: User, as: 'Followers' ,
+          {
+            model: User, as: 'Followers',
             where: { role: { [Op.not]: 'admin' } }
           }
         ],
@@ -316,7 +317,7 @@ let userController = {
       const { id } = req.params
       let user = await User.findByPk(id, {
         include: [
-          { 
+          {
             model: User, as: 'Followings',
             where: { role: { [Op.not]: 'admin' } }
           }
@@ -355,13 +356,13 @@ let userController = {
           [Sequelize.literal('COUNT(DISTINCT Likes.id)'), 'LikesCount'],
           [Sequelize.literal('COUNT(DISTINCT Replies.id)'), 'RepliesCount']
           ],
-          group: ['TweetId', 'Likes.createdAt'],
+          group: ['TweetId'],
           include: [
-            { model: Like, attributes: ['createdAt'] },
+            { model: Like, attributes: [] },
             { model: Reply, attributes: [] },
             {
               model: User,
-              attributes:['id', 'name', 'avatar', 'account', 'role'],
+              attributes: ['id', 'name', 'avatar', 'account', 'role'],
               where: { role: { [Op.not]: 'admin' } }
             }
           ],
@@ -441,7 +442,7 @@ let userController = {
       // 簽發 token
       const payload = { id: user.id }
       const token = jwt.sign(payload, process.env.JWT_SECRET)
-      return res.render('index',{
+      return res.render('index', {
         token: token,
         user: {
           id: user.id,
